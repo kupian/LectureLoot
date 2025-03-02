@@ -1,0 +1,46 @@
+.bg-primary {
+  background-color: #8540f5 !important;
+}
+
+.bg-primary-dark {
+  background-color: #5227cc !important;
+}
+
+.btn-primary {
+  background-color: #8540f5 !important;
+  border-color: #8540f5 !important;
+}
+
+.btn-primary-dark {
+  background-color: #5227cc !important;
+  border-color: #5227cc !important;
+}
+
+.navbar-light .navbar-brand,
+.navbar-light .nav-link {
+  color: #ffffff !important;
+}
+
+.profile-button {
+  width: 37px; 
+  height: 37px;
+  background-color: #70a6fc; 
+  border: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.profile-button:hover {
+  background-color: #70a6fc;
+  border: #70a6fc;
+}
+
+.profile-button img {
+  color: #303b49;
+  font-size: 1.5rem;
+  width: 125%; 
+  height: 125%; 
+  object-fit: cover;
+}
