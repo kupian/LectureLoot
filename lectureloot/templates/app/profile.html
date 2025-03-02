@@ -1,0 +1,66 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block body_block %}
+<div class="container" style="box-shadow: none;">
+    <h2>Profile</h2>
+    <table class="profile-table">
+        <tr>
+            <th>Name</th>
+            <td>{{ user.name }}</td>
+            <td><button class="btn btn-primary-dark" onclick="window.location.href='/profile/edit?autofocus=firstName'">Change</button></td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ user.email }}</td>
+            <td><button class="btn btn-primary-dark" onclick="window.location.href='/profile/edit?autofocus=email'">Change</button></td>
+        </tr>
+        <tr>
+            <th>Username</th>
+            <td>{{ user.username }}</td>
+            <td><button class="btn btn-primary-dark" onclick="window.location.href='/profile/edit?autofocus=username'">Change</button></td>
+        </tr>
+        <tr>
+            <th>Password</th>
+            <td>********</td>
+            <td><button class="btn btn-primary-dark" onclick="window.location.href='/profile/change-password'">Change</button></td>
+        </tr>
+        <tr>
+            <th>Rating</th>
+            <td>{{ user.rating }}</td>
+            <td></td>
+        </tr>
+    </table>
+</div>
+
+<style>
+    .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .profile-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .profile-table th, .profile-table td {
+        text-align: left;
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+    }
+    .btn {
+        background-color: #7a33cc;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn:hover {
+        background-color: #5a2499;
+    }
+</style>
+{% endblock %}

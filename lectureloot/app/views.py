@@ -4,3 +4,14 @@ from django.shortcuts import render
 
 def index(request):
   return render(request, "app/index.html")
+
+def profile(request):
+  context_dict = {
+    'user': {
+      'name': "Example Name",
+      'email': "example@domain.com",
+      'username': "ExampleUserName",
+      'rating': 4.7 
+    }
+  }
+  return render(request, "app/profile.html", context=context_dict);
