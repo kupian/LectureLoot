@@ -1,0 +1,10 @@
+.profile-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.profile-table th, .profile-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+

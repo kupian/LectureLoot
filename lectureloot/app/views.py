@@ -15,3 +15,9 @@ def profile(request):
     }
   }
   return render(request, "app/profile.html", context=context_dict);
+
+def register(request):
+  return render(request, "app/register.html");
+
+def login(request):
+  return render(request, "app/login.html");

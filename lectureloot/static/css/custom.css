@@ -6,19 +6,28 @@
   background-color: #5227cc !important;
 }
 
+.btn {
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+
 .btn-primary {
   background-color: #8540f5 !important;
-  border-color: #8540f5 !important;
+  padding: 2px 10px !important;
+  border-radius: 4px;
 }
 
 .btn-primary-dark {
-  padding: 2px 10px !important;
   background-color: #5227cc !important;
-  border-color: #5227cc !important;
+  padding: 2px 10px !important;
+  border-radius: 4px;
 }
 
 .btn-primary-dark:hover {
   color: white !important;
+  background-color: #5a2499;
 }
 
 .navbar-light .navbar-brand,
@@ -48,4 +57,12 @@
   width: 125%; 
   height: 125%; 
   object-fit: cover;
+}
+
+.container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
 }
