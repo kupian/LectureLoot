@@ -1,0 +1,18 @@
+<!--templates/app/listing_create.html-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Create a New Listing</title>
+    </head>
+    <body>
+        <h1>Create Listing</h1>
+        <!--Form to create a new listing-->
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <!--Render all form fields as paragraphs-->
+            {{ form.as_p }}
+            <!--Submit button-->
+            <button type="submit">Submit</button>
+        </form>
+    </body>
+</html>
