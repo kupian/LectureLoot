@@ -8,8 +8,11 @@
     {% load bootstrap5 %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}  
+    <script type="text/javascript" src="{% static 'js/jquery-3.7.1.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">  
-    <link rel="stylesheet" href="{% static 'css/profile.css' %}">  
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}"> 
+    
+    <title>LectureLoot - {% block title_block %}{% endblock %}</title>
 
   </head>
   <body>
