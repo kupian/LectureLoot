@@ -1,4 +1,5 @@
 {% load static %}
+<script type="text/javascript" src="{% static 'js/search.js' %}"></script>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-primary">
   <div class="container-fluid">
@@ -25,8 +26,8 @@
       </ul>
 
       <!-- Search Bar -->
-      <form class="d-flex me-3" role="search">
-        <input class="form-control rounded-pill me-2" type="search" placeholder="Search..." aria-label="Search">
+      <form class="d-flex me-3" role="search" method="GET" id="search">
+        <input class="form-control rounded-pill me-2" type="search" placeholder="Search..." aria-label="Search" id="query">
       </form>
 
       <a href="/profile">
