@@ -47,7 +47,7 @@ class Listing(models.Model):
     # price of the item, stored as a decimal number
     price = models.DecimalField(max_digits = 8, decimal_places = 2)
     # category
-    category = models.CharField(max_length = 100)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category", help_text="Category of item")
     # optional description of the item
     description = models.TextField(blank = True, null = True)
     # optional image for the listing; images will be uploaded to 'listing_images/'
