@@ -96,5 +96,7 @@ def search(request, query):
       "query": query,
       "results": query_matches,
     }
+    
+    print(query_matches)
   
   return render(request, "app/search.html", context)
