@@ -58,12 +58,9 @@ class Listing(models.Model):
         # display the listing title along with the sellers username for clarity
         return f"{self.title} (Seller: {self.seller.username})"
 
-
-
-
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=False)
-    user = models.ForeignObject(User, on_delete=models.CASCADE, blank=False)
+    user = models.ForeignObject(CustomUser, on_delete=models.CASCADE, blank=False)
     amount = models.DecimalField(blank=False)
     time = models.DateField(auto_now=True)
     
