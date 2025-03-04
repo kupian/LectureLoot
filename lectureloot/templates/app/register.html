@@ -2,7 +2,11 @@
 
 {% block body_block %}
 <div class="container mt-0">
-  <h2 class="mb-4">Register</h2>
+  {% if register %}
+    <h2 class="mb-4">Register:</h2>
+  {% else %}
+    <h2>Edit profile:</h2>
+  {% endif %}
   <div class="space"></div>
   <div class="row justify-content-center">
     <div class="col-md-8">
@@ -10,23 +14,25 @@
         <div class="row mb-3">
           <div class="col">
             <label for="first_name" class="form-label">First Name:</label>
-            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name">
+            <input type="text" class="form-control" id="first_name" name="first_name" placeholder="First Name" required value={{values.firstName}}>
           </div>
           <div class="col">
             <label for="last_name" class="form-label">Family Name:</label>
-            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Family Name">
+            <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Family Name" required value={{values.familyName}} >
           </div>
         </div>
 
         <div class="mb-3">
           <label for="username" class="form-label">Username:</label>
-          <input type="text" class="form-control" id="username" name="username" placeholder="Username" required>
+          <input type="text" class="form-control" id="username" name="username" placeholder="Username" required value={{values.username}}>
         </div>
 
         <div class="mb-3">
           <label for="email" class="form-label">Email:</label>
-          <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+          <input type="email" class="form-control" id="email" name="email" placeholder="Email" required value={{values.email}}>
         </div>
+
+        {% if register %}
 
         <div class="row mb-3">
           <div class="col">
@@ -44,8 +50,35 @@
         <div class="text-center">
           <button type="submit" class="btn btn-primary-dark">Register</button>
         </div>
+
+        {% else %}
+          <div class="col mt-5 mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+          </div>
+
+          <div class="text-center">
+            <button type="submit" class="btn btn-primary-dark">Confirm</button>
+          </div>
+        {% endif %}
+
+
       </form>
     </div>
   </div>
 </div>
+
+
+{% if not register %}
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const autoFocus = params.get('autofocus');
+
+    const input = document.getElementById(autoFocus);
+    if (input) {
+      input.focus();
+      input.setSelectionRange(input.value.length, input.value.length);
+    }
+  </script>
+{% endif %}
 {% endblock %}
