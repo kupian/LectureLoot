@@ -1,10 +1,5 @@
 from django.db import models
 
-# Create your models here.
-class User(models.Model):
-    pass
-class Listing(models.Model):
-    pass
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=False)
     user = models.ForeignObject(User, on_delete=models.CASCADE, blank=False)
