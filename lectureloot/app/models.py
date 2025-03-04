@@ -70,7 +70,7 @@ class Listing(models.Model):
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=False)
-    amount = models.DecimalField(blank=False)
+    amount = models.DecimalField(blank=False, decimal_places=2, max_digits=6)
     time = models.DateField(auto_now=True)
     
     def __str__(self):
