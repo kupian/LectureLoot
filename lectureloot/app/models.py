@@ -22,6 +22,15 @@ class CustomUser(AbstractUser):
     def __str__(self):
         # return username when printing the user object
         return self.username
+    
+class Category(models.Model):
+    MAX_NAME_LENGTH = 128
+    name = models.CharField(max_length=MAX_NAME_LENGTH, unique=True)
+    class Meta:
+        verbose_name_plural = 'Categories'
+
+    def __str__(self):
+        return self.name
 
 # Listing Model
 class Listing(models.Model):
@@ -60,7 +69,7 @@ class Listing(models.Model):
 
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=False)
-    user = models.ForeignObject(CustomUser, on_delete=models.CASCADE, blank=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=False)
     amount = models.DecimalField(blank=False)
     time = models.DateField(auto_now=True)
     
