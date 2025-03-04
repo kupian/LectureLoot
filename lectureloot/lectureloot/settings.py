@@ -41,8 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'app',
-    'django_bootstrap5',
-    'fontawesome' # for icons  
+    'bootstrap5', 
 ]
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
