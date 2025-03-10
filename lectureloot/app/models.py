@@ -4,6 +4,7 @@ from django.conf import settings
 
 # User Model
 class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
     # decimal field to store the user rating (e.g., 0.00 to 5.00)
     rating = models.DecimalField(
         max_digits = 3, # max number of digits 
@@ -19,9 +20,12 @@ class CustomUser(AbstractUser):
         null = True # field can be null in the database 
     )
 
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
+
     def __str__(self):
         # return username when printing the user object
-        return self.username
+        return self.email
     
 class Category(models.Model):
     MAX_NAME_LENGTH = 128

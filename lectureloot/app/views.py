@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .models import Listing
 from .forms import ListingForm 
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib import messages
 
 # Listing views
 def listing_detail(request, pk):
@@ -81,7 +83,21 @@ def edit_profile(request):
   return render(request, "app/register.html", context=context_dict)
 
 def login(request):
-  return render(request, "app/login.html")
+  if request.method == "POST":
+    email = request.POST.get("email")
+    password = request.POST.get("password1")
+    user = authenticate(request, username=email, password=password)
+    if user:
+      if user.is_active:
+        auth_login(request, user)
+        return redirect("app:index")
+      else:
+        messages.error(request, "User is not active")
+    else:
+      messages.error(request, "Invalid login details") 
+  else:
+      
+    return render(request, "app/login.html")
 
 def change_password(request):
   return render(request, "app/change_password.html")
@@ -100,3 +116,8 @@ def search(request, query):
     print(query_matches)
   
   return render(request, "app/search.html", context)
+
+def logout(request):
+  auth_logout(request)
+  return redirect("app:index")
+  
