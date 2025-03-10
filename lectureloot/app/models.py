@@ -66,7 +66,16 @@ class Listing(models.Model):
     def __str__(self):
         # display the listing title along with the sellers username for clarity
         return f"{self.title} (Seller: {self.seller.username})"
+    
+# define a new model to represent a Category
+class Category(models.Model):
+    name = models.CharField(max_lengt=100, unique=True)
+    description = models.TextField(blank=True, null=True)
 
+    def __str__(self):
+        return self.name
+        
+# define a new model to represent Bid
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=False)
