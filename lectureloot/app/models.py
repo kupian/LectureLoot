@@ -26,6 +26,7 @@ class CustomUser(AbstractUser):
 class Category(models.Model):
     MAX_NAME_LENGTH = 128
     name = models.CharField(max_length=MAX_NAME_LENGTH, unique=True)
+    description = models.TextField(blank=True, null=True)
     class Meta:
         verbose_name_plural = 'Categories'
 
@@ -66,7 +67,8 @@ class Listing(models.Model):
     def __str__(self):
         # display the listing title along with the sellers username for clarity
         return f"{self.title} (Seller: {self.seller.username})"
-
+        
+# define a new model to represent Bid
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=False)

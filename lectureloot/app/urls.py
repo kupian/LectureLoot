@@ -18,4 +18,6 @@ urlpatterns = [
   # View to create a new listing; only accessible by logged-in users
   path('listing/new/', views.listing_create, name='listing_create'),
   path('search/<str:query>/', views.search, name="search"),
+  # URL pattern for the categories page
+  path('categories/', views.categories, name='categories'),
 ]

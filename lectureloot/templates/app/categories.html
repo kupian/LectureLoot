@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Categories</title>
+</head>
+<body>
+    <h1>Categories</h1>
+    <ul>
+        <!--Loop through the categories passed in the context-->
+        {% for category in categories %}
+        <li>
+            <!--Display the category name, and optionally the description-->
+            {{ category.name }}
+            {% if category.description %}
+                - {{ category.description }}
+            {% endif %}
+        </li>
+        {% empty %}
+        <!-- If there are no categories, display a default message-->
+         <li>No categories found.</li>
+         {% endfor %}
+    </ul>
+</body>
+</html>
