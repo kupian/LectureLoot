@@ -121,7 +121,7 @@ def categories(request):
   }
 
   # render the 'categories.html' template within the 'app' folder
-  return render(request, 'app/categories.html', context)
+  return render(request, 'app/categories.html', context=context)
 
 
 
