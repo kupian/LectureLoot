@@ -1,8 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Categories</title>
-</head>
+<!--templates/app/listing_detail.html-->
+{% extends 'app/base.html' %}
+
+{% block title_block %}Categories{% endblock %}
+
+{% block body_block %}
 <body>
     <h1>Categories</h1>
     <ul>
@@ -10,7 +11,7 @@
         {% for category in categories %}
         <li>
             <!--Display the category name, and optionally the description-->
-            {{ category.name }}
+            <a href="{% url 'app:category' category.name %}">{{ category.name }}</a>
             {% if category.description %}
                 - {{ category.description }}
             {% endif %}
@@ -20,5 +21,4 @@
          <li>No categories found.</li>
          {% endfor %}
     </ul>
-</body>
-</html>
+{% endblock %}

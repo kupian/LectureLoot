@@ -1,29 +1,26 @@
 <!--templates/app/listing_detail.html-->
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>{{ listing.title }}</title>
-    </head>
-    <body>
-        <!--Display the title of the listing-->
-        <h1>{{ listing.title }}</h1>
-        <!--Display the price of the item-->
-        <p><strong>Price:</strong> £{{ listing.price }}</p>
-        <!--Display the category-->
-        <p><strong>Category:</strong> {{ listing.category }}</p>
-        <!--Display the description if provided-->
-        <p><strong>Description:</strong> {{ listing.description }}</p>
+{% extends 'app/base.html' %}
 
-        <!--Check if an image exists, and then display it-->
-        {% if listing.image %}
-        <img src="{{ listing.image.url }}" alt = "Listing Image" style = "max-width: 400px;">
-        {% endif %}
+{% block title_block %}{{ listing.title }}{% endblock %}
 
-        <!--Display the seller's username-->
-        <p><strong>Seller:</strong> {{ listing.seller.username }}</p>
-        <!--Display the date and time the listing was created-->
-        <p><strong>Posted on:</strong> {{list.created_at}}</p>
+{% block body_block %}
+    <!--Display the title of the listing-->
+    <h1>{{ listing.title }}</h1>
+    <!--Display the price of the item-->
+    <p><strong>Price:</strong> £{{ listing.price }}</p>
+    <!--Display the category-->
+    <p><strong>Category:</strong> {{ listing.category }}</p>
+    <!--Display the description if provided-->
+    <p><strong>Description:</strong> {{ listing.description }}</p>
 
+    <!--Check if an image exists, and then display it-->
+    {% if listing.image %}
+    <img src="{{ listing.image.url }}" alt = "Listing Image" style = "max-width: 400px;">
+    {% endif %}
 
-    </body>
-</html>
+    <!--Display the seller's username-->
+    <p><strong>Seller:</strong> {{ listing.seller.username }}</p>
+    <!--Display the date and time the listing was created-->
+    <p><strong>Posted on:</strong> {{list.created_at}}</p>
+
+{% endblock %}

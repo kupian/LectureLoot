@@ -108,7 +108,7 @@ def search(request, query):
   
   return render(request, "app/search.html", context)
 
-# category view
+# categories list
 def categories(request):
   '''Retrieve all Category objects from the database and render the categories page'''
 
@@ -123,5 +123,17 @@ def categories(request):
   # render the 'categories.html' template within the 'app' folder
   return render(request, 'app/categories.html', context=context)
 
-
+# category view
+def category(request, name):
+  category = Category.objects.get(name=name)
+  if category is None:
+    listings = None
+  else:
+    listings = Listing.objects.filter(category = category)
+    
+  context = {
+    "name": name,
+    "listings": listings,
+  }
+  return render(request, 'app/category.html', context=context)
 

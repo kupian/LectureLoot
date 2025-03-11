@@ -20,4 +20,5 @@ urlpatterns = [
   path('search/<str:query>/', views.search, name="search"),
   # URL pattern for the categories page
   path('categories/', views.categories, name='categories'),
+  path('category/<str:name>/', views.category, name='category'),
 ]
