@@ -7,10 +7,13 @@
 {% block body_block %}
 
     <h1>{{ name }}</h1>
-
-    {% for listing in listings %}
-        <div class="col col-12 col-md-6 col-lg-4">
-            {% render_listing listing %}
-        </div>
-    {% endfor %}
+    {% if listings %}
+    <div class="row g-4">
+        {% for listing in listings %}
+            <div class="col col-12 col-md-6 col-lg-4">
+                {% render_listing listing %}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 {% endblock %}
