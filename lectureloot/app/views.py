@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from .models import Listing, Category
+from django.http import JsonResponse
+from .models import Listing, Category, Bid
 from .forms import ListingForm 
 from datetime import datetime
 
@@ -141,13 +142,25 @@ def category(request, name):
 @login_required
 def submit_bid(request, listing_id):
   listing = Listing.objects.get(pk=listing_id)
-  if listing is not None:
-    if listing.end_datetime < datetime.now():
-      # TODO: return error
-      return render(request, 'index.html')
-    else:
-      return render(request, 'index.html')
-      # TODO: return success
-  else:
-    return render(request, 'index.html')
-    # TODO: return error
+  if listing is None:
+    return JsonResponse({
+    "message": "Invalid listing"
+    })
+    
+  if listing.end_datetime < datetime.now():
+    return JsonResponse({
+      "message": "Listing has ended"
+    })
+  
+  highest_bid_amount = Bid.objects.order_by('-amount').first().amount
+  if request.POST["amount"] <= highest_bid_amount:
+    return JsonResponse({
+      "message": "Amount must be greater than highest bid"
+    })
+    
+  bid = Bid(listing=listing, user=request.user, amount=request.POST["amount"])
+  bid.save()
+  return JsonResponse({
+    "message": "success"
+  })
+  
