@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .models import Listing, Category
 from .forms import ListingForm 
+from datetime import datetime
 
 # Listing view
 def listing_detail(request, pk):
@@ -141,8 +142,12 @@ def category(request, name):
 def submit_bid(request, listing_id):
   listing = Listing.objects.get(pk=listing_id)
   if listing is not None:
-    return render(request, 'index.html')
-    # TODO: page after bid
+    if listing.end_datetime < datetime.now():
+      # TODO: return error
+      return render(request, 'index.html')
+    else:
+      return render(request, 'index.html')
+      # TODO: return success
   else:
     return render(request, 'index.html')
-    # TODO: error page
+    # TODO: return error
