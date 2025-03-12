@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .models import Listing, Category
 from .forms import ListingForm 
+from datetime import datetime
 
 # Listing view
 def listing_detail(request, pk):
@@ -108,7 +109,7 @@ def search(request, query):
   
   return render(request, "app/search.html", context)
 
-# category view
+# categories list
 def categories(request):
   '''Retrieve all Category objects from the database and render the categories page'''
 
@@ -123,5 +124,30 @@ def categories(request):
   # render the 'categories.html' template within the 'app' folder
   return render(request, 'app/categories.html', context=context)
 
+# category view
+def category(request, name):
+  category = Category.objects.get(name=name)
+  if category is None:
+    listings = None
+  else:
+    listings = Listing.objects.filter(category = category)
+    
+  context = {
+    "name": name,
+    "listings": listings,
+  }
+  return render(request, 'app/category.html', context=context)
 
-
+@login_required
+def submit_bid(request, listing_id):
+  listing = Listing.objects.get(pk=listing_id)
+  if listing is not None:
+    if listing.end_datetime < datetime.now():
+      # TODO: return error
+      return render(request, 'index.html')
+    else:
+      return render(request, 'index.html')
+      # TODO: return success
+  else:
+    return render(request, 'index.html')
+    # TODO: return error

@@ -1,0 +1,19 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% load listing_card %}
+
+{% block title_block %}{{ name }}{% endblock %}
+
+{% block body_block %}
+
+    <h1>{{ name }}</h1>
+    {% if listings %}
+    <div class="row g-4">
+        {% for listing in listings %}
+            <div class="col col-12 col-md-6 col-lg-4">
+                {% render_listing listing %}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endblock %}
