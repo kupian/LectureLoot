@@ -55,7 +55,7 @@
 <script>
     function updateCountdown() {
         const endTime = new Date("{{ listing.end_datetime|date:'Y-m-d H:i:s' }}").getTime();
-        const countdownElement = document.getElementById("countdown");
+        const countdownElement = $("#countdown")[0];
         
         function calculateTime() {
             const now = new Date().getTime();
@@ -78,7 +78,7 @@
         const timer = setInterval(calculateTime, 1000);
     }
     
-    document.addEventListener("DOMContentLoaded", updateCountdown);
+    $(document).ready(updateCountdown);
 </script>
 
 {% endblock %}
