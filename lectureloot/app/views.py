@@ -137,3 +137,12 @@ def category(request, name):
   }
   return render(request, 'app/category.html', context=context)
 
+@login_required
+def submit_bid(request, listing_id):
+  listing = Listing.objects.get(pk=listing_id)
+  if listing is not None:
+    return render(request, 'index.html')
+    # TODO: page after bid
+  else:
+    return render(request, 'index.html')
+    # TODO: error page
