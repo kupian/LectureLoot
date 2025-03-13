@@ -2,9 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.http import JsonResponse
+from django.utils.timezone import now
 from .models import Listing, Category, Bid
 from .forms import ListingForm 
-from datetime import datetime
 
 # Listing view
 def listing_detail(request, pk):
@@ -139,27 +139,40 @@ def category(request, name):
   }
   return render(request, 'app/category.html', context=context)
 
-@login_required
 def submit_bid(request, listing_id):
+  if request.user.is_authenticated is False:
+    return JsonResponse({
+      "message": "You must be logged in to place a bid",
+    }, status=403)
+  
   listing = Listing.objects.get(pk=listing_id)
+  amount = float(request.POST.get("amount", 0))
   if listing is None:
     return JsonResponse({
     "message": "Invalid listing"
-    })
+    }, status=403)
     
-  if listing.end_datetime < datetime.now():
+  if listing.end_datetime < now():
     return JsonResponse({
       "message": "Listing has ended"
-    })
+    }, status=403)
   
-  highest_bid_amount = Bid.objects.order_by('-amount').first().amount
-  if request.POST["amount"] <= highest_bid_amount:
+  try:
+    highest_bid_amount = listing.highest_bid.amount
+  except AttributeError:
+    highest_bid_amount = 0
+
+  if amount <= highest_bid_amount:
     return JsonResponse({
       "message": "Amount must be greater than highest bid"
-    })
+    }, status=403)
     
-  bid = Bid(listing=listing, user=request.user, amount=request.POST["amount"])
+  bid = Bid(listing=listing, user=request.user, amount=amount)
   bid.save()
+  
+  listing.highest_bid = bid
+  listing.save()
+  
   return JsonResponse({
     "message": "success"
   })
