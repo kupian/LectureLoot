@@ -1,18 +1,31 @@
-<!--templates/app/listing_create.html-->
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Create a New Listing</title>
-    </head>
-    <body>
-        <h1>Create Listing</h1>
-        <!--Form to create a new listing-->
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <!--Render all form fields as paragraphs-->
-            {{ form.as_p }}
-            <!--Submit button-->
-            <button type="submit">Submit</button>
-        </form>
-    </body>
-</html>
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block body_block %}
+    <h1>Create Listing</h1>
+    <!--Form to create a new listing-->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!--Render all form fields as paragraphs-->
+        {{ form.as_p }}
+
+        <h2>Upload Media (Images/Videos)</h2>
+        {{ media_formset.management_form }}
+        
+        <!-- Render media form fields -->
+        {% for form in media_formset %}
+            <div class="media-form">
+                <div class="media-0">
+                    {{ form.file.label_tag }} {{ form.file }}
+                    <br>
+                </div>
+            </div>
+        {% endfor %}
+
+        <!--Submit button-->
+        <button type="submit">Submit</button>
+    </form>
+
+    <script src="{% static '/js/add_media.js' %}"></script>
+
+{% endblock %}

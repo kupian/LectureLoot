@@ -1,29 +1,74 @@
-<!--templates/app/listing_detail.html-->
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>{{ listing.title }}</title>
-    </head>
-    <body>
-        <!--Display the title of the listing-->
-        <h1>{{ listing.title }}</h1>
-        <!--Display the price of the item-->
-        <p><strong>Price:</strong> £{{ listing.price }}</p>
-        <!--Display the category-->
-        <p><strong>Category:</strong> {{ listing.category }}</p>
-        <!--Display the description if provided-->
-        <p><strong>Description:</strong> {{ listing.description }}</p>
+{% extends 'app/base.html' %}
+{% load static %}
 
-        <!--Check if an image exists, and then display it-->
-        {% if listing.image %}
-        <img src="{{ listing.image.url }}" alt = "Listing Image" style = "max-width: 400px;">
-        {% endif %}
+{% block body_block %}
+<div class="container mt-5">
+	<div class="row">
+		<!-- Left side: Image and description -->
+		<div class="col-md-8">
 
-        <!--Display the seller's username-->
-        <p><strong>Seller:</strong> {{ listing.seller.username }}</p>
-        <!--Display the date and time the listing was created-->
-        <p><strong>Posted on:</strong> {{list.created_at}}</p>
+			<div class="d-flex flex-wrap justify-content-between">
+				<h1 class="fw-bold">{{ listing.title }}</h1>
+				<a class="text-muted" href="/merchant/{{ listing.seller.username }}">by {{ listing.seller.username }}</a>
+			</div>
 
 
-    </body>
-</html>
+			{% if media %}
+			<div id="listingCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+				<div class="carousel-inner text-center">
+					{% for item in media %}
+					<div class="carousel-item {% if forloop.first %}active{% endif %}">
+						{% if item.media_type == 'image' %}
+							<img src="{{ item.file.url }}" class="d-block rounded border mx-auto"
+								alt="Listing Media"
+								style="max-width: 100%; max-height: 400px; height: auto; border: 2px solid #ccc;">
+						{% elif item.media_type == 'video' %}
+							<video class="d-block rounded border mx-auto" controls
+								style="max-width: 100%; max-height: 400px; height: auto; border: 2px solid #ccc;">
+								<source src="{{ item.file.url }}" type="video/mp4">
+								Your browser does not support the video tag.
+							</video>
+						{% endif %}
+					</div>
+					{% endfor %}
+				</div>
+			
+				<!-- Carousel Controls -->
+				<button class="carousel-control-prev" type="button" data-bs-target="#listingCarousel" data-bs-slide="prev">
+					<span class="carousel-control-prev-icon" aria-hidden="true" style="filter: invert(1);"></span>
+					<span class="visually-hidden">Previous</span>
+				</button>
+				<button class="carousel-control-next" type="button" data-bs-target="#listingCarousel" data-bs-slide="next">
+					<span class="carousel-control-next-icon" aria-hidden="true" style="filter: invert(1);"></span>
+					<span class="visually-hidden">Next</span>
+				</button>
+			</div>
+			{% endif %}
+
+
+			<p>{{ listing.description }}</p>
+		</div>
+
+		<!-- Right side: Price, bidding info, and buttons -->
+		<div class="col-md-4">
+			<div class="p-4 border rounded">
+				<p class="fw-bold mb-2">Minimum price:</p>
+				<h2 class="text-primary">£{{ listing.price }}</h2>
+
+				<div class="d-grid gap-2">
+					<button class="btn btn-primary-dark">Contact seller</button>
+				</div>
+
+				<hr />
+
+				<p class="fw-bold mb-2">Bidding ends:</p>
+				<p>{{ listing.end_time|date:"d/m/Y, g:i A T" }}</p>
+
+				<div class="d-grid gap-2">
+					<button class="btn btn-primary-dark">Open bidding</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

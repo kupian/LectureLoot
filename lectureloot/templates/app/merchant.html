@@ -1,0 +1,22 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block body_block %}
+<div class="container">
+    <h2>Merchant: {{user.username}}</h2>
+    <table class="profile-table">
+        <tr>
+            <th>Name</th>
+            <td>{{ user.name }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ user.email }}</td>
+        </tr>
+        <tr>
+            <th>Rating</th>
+            <td>{{ user.rating }}</td>
+        </tr>
+    </table>
+</div>
+{% endblock %}
