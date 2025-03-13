@@ -1,7 +1,7 @@
 {% extends 'app/base.html' %}
+{% block title_block %}{{ listing.title }}{% endblock %}
 {% load static %}
-
-{% block body_block %}
+{% block body_block %}  
 <div class="container mt-5">
 	<div class="row">
 		<!-- Left side: Image and description -->
@@ -45,15 +45,16 @@
 			</div>
 			{% endif %}
 
-
-			<p>{{ listing.description }}</p>
+      <p><strong>Posted on:</strong> {{ listing.created_at }}</p>
+      <p>{{ listing.description }}</p>
 		</div>
 
 		<!-- Right side: Price, bidding info, and buttons -->
 		<div class="col-md-4">
 			<div class="p-4 border rounded">
-				<p class="fw-bold mb-2">Minimum price:</p>
-				<h2 class="text-primary">£{{ listing.price }}</h2>
+				<p class="fw-bold mb-2">Highest bid:</p>
+				<h2 id="highestBid" class="text-primary">£{{ listing.highest_bid.amount }}</h2>
+        <h3 id="winning"></h3>
 
 				<div class="d-grid gap-2">
 					<button class="btn btn-primary-dark">Contact seller</button>
@@ -62,13 +63,128 @@
 				<hr />
 
 				<p class="fw-bold mb-2">Bidding ends:</p>
-				<p>{{ listing.end_time|date:"d/m/Y, g:i A T" }}</p>
+				<p id="countdown"></p>
 
 				<div class="d-grid gap-2">
-					<button class="btn btn-primary-dark">Open bidding</button>
+					<form method="POST" id="bidForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="bidAmount" class="form-label">Your Bid (£)</label>
+                    <input type="number" step="0.01" min="{{ listing.highest_bid.amount }}" class="form-control" id="amount" name="amount" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Bid</button>
+            </form>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Error</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p id="message"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+    function getRemainingTime() {
+      const endTime = new Date("{{ listing.end_datetime|date:'Y-m-d H:i:s' }}").getTime();
+      const now = new Date().getTime();
+      const timeLeft = endTime - now;
+      return timeLeft;
+    }
+  
+    function updateCountdown() {
+        const countdownElement = $("#countdown")[0];
+        
+        function calculateTime() {
+            const timeLeft = getRemainingTime()
+            
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+                
+                countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            } else {
+                countdownElement.innerHTML = "Listing Ended";
+                clearInterval(timer);
+            }
+        }
+        
+        calculateTime();
+        const timer = setInterval(calculateTime, 1000);
+    }
+
+    function getHighestBid() {
+        $.ajax({
+                type: "POST",
+                url: "/highest-bid/{{ listing.id }}",
+                data: {
+                    csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
+                },
+                success: function(res) {
+                    $("#highestBid").text(`£${res.amount}`);
+                    
+                    if(res.user_id == {{ user.id }}) {
+                      $("#winning").text("You are the highest bidder!");
+                    }
+                }
+            });
+        
+        if (getRemainingTime() < 60000 && !finalMinute) {
+          finalMinute = true;
+          interval = 1000;
+          clearInterval(highestBidtimer);
+          highestBidTimer = setInterval(getHighestBid, interval);
+        }
+      }
+  
+    function getHighestBidPeriodic() {
+      let interval = 60000;
+      let finalMinute = false;
+      
+      getHighestBid();
+      let highestBidTimer = setInterval(getHighestBid, interval);
+    }
+    
+    $(document).ready(function() {
+        updateCountdown();
+        getHighestBidPeriodic();
+
+        $("#bidForm").submit(function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                type: "POST",
+                url: "/bid/{{ listing.id }}",
+                data: {
+                    amount: $("#amount").val(),
+                    csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
+                },
+                success: function() {
+                    getHighestBid();
+                },
+                error: function(e) {
+                    $("#message").text($.parseJSON(e.responseText).message);
+                    const myModal = new bootstrap.Modal($("#errorModal"));
+                    myModal.show();
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}

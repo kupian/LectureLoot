@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'app',
     'bootstrap5', 
 ]
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Tell django to use custom user model instead of default auth.User

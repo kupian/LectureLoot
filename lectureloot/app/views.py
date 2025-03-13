@@ -2,10 +2,12 @@ from django.forms import modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from .models import Listing, CustomUser, Media
-from .forms import ListingForm, MediaForm, MediaFormSet 
+from django.http import JsonResponse
+from django.utils.timezone import now
+from .models import Listing, Category, Bid, CustomUser, Media
+from .forms import ListingForm, MediaForm, MediaFormSet
 
-# Listing views
+# Listing view
 def listing_detail(request, pk):
   """
   Retrieve and display details for a single listing
@@ -38,6 +40,11 @@ def listing_create(request):
       # set the seller to the currently logged in user
       new_listing.seller = request.user
       # save the listing to the database
+      
+      dummy_bid = Bid(user=request.user, amount=request.POST["price"])
+      dummy_bid.save()
+      new_listing.highest_bid = dummy_bid
+      
       new_listing.save()
 
       # Save media files associated with the listing
@@ -56,9 +63,11 @@ def listing_create(request):
   # render the 'listing_create.html' template with the form context
   return render(request, 'app/listing_create.html', {'form':form,'media_formset':media_formset})
 
+# index view
 def index(request):
   return render(request, "app/index.html")
 
+# profile view
 def profile(request):
   context_dict = {
     'user': {
@@ -70,6 +79,7 @@ def profile(request):
   }
   return render(request, "app/profile.html", context=context_dict)
 
+# register view
 def register(request):
   context_dict = {
     'register': True,
@@ -83,6 +93,7 @@ def register(request):
   
   return render(request, "app/register.html", context=context_dict)
 
+# edit profile view
 def edit_profile(request):
   context_dict = {
     'register': False,
@@ -96,12 +107,15 @@ def edit_profile(request):
 
   return render(request, "app/register.html", context=context_dict)
 
+# login view
 def login(request):
   return render(request, "app/login.html")
 
+# change password view
 def change_password(request):
   return render(request, "app/change_password.html")
 
+# search view
 def search(request, query):
   media_path = settings.MEDIA_URL
   
@@ -117,6 +131,73 @@ def search(request, query):
   
   return render(request, "app/search.html", context)
 
+# categories list
+def categories(request):
+  '''Retrieve all Category objects from the database and render the categories page'''
+
+  # Query all Category instances
+  all_categories = Category.objects.all()
+
+  # prepare the context to pass into template
+  context = {
+    'categories': all_categories,
+  }
+
+  # render the 'categories.html' template within the 'app' folder
+  return render(request, 'app/categories.html', context=context)
+
+# category view
+def category(request, name):
+  category = Category.objects.get(name=name)
+  if category is None:
+    listings = None
+  else:
+    listings = Listing.objects.filter(category = category)
+    
+  context = {
+    "name": name,
+    "listings": listings,
+  }
+  return render(request, 'app/category.html', context=context)
+
+def submit_bid(request, listing_id):
+  if request.user.is_authenticated is False:
+    return JsonResponse({
+      "message": "You must be logged in to place a bid",
+    }, status=403)
+  
+  listing = Listing.objects.get(pk=listing_id)
+  amount = float(request.POST.get("amount", 0))
+  if listing is None:
+    return JsonResponse({
+    "message": "Invalid listing"
+    }, status=403)
+    
+  if listing.end_datetime < now():
+    return JsonResponse({
+      "message": "Listing has ended"
+    }, status=403)
+  
+  try:
+    highest_bid_amount = listing.highest_bid.amount
+  except AttributeError:
+    highest_bid_amount = 0
+
+  if amount <= highest_bid_amount:
+    return JsonResponse({
+      "message": "Amount must be greater than highest bid"
+    }, status=403)
+    
+  bid = Bid(listing=listing, user=request.user, amount=amount)
+  bid.save()
+  
+  listing.highest_bid = bid
+  listing.save()
+  
+  return JsonResponse({
+    "message": "success"
+  })
+
 def merchant(request, username):
   media_path = settings.MEDIA_URL
 
@@ -128,3 +209,20 @@ def merchant(request, username):
     }
 
   return render(request, "app/merchant.html", context)
+
+def highest_bid(request, listing_id):
+  listing = Listing.objects.get(pk=listing_id)
+  if listing is None:
+    return JsonResponse({
+    "message": "Invalid listing"
+    }, status=403)
+    
+  amount = listing.highest_bid.amount
+  user_id = listing.highest_bid.user.id
+  
+  context_dict = {
+    "amount": amount,
+    "user_id": user_id
+  }
+  
+  return JsonResponse(context_dict)

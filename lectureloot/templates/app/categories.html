@@ -1,0 +1,24 @@
+<!--templates/app/listing_detail.html-->
+{% extends 'app/base.html' %}
+
+{% block title_block %}Categories{% endblock %}
+
+{% block body_block %}
+<body>
+    <h1>Categories</h1>
+    <ul>
+        <!--Loop through the categories passed in the context-->
+        {% for category in categories %}
+        <li>
+            <!--Display the category name, and optionally the description-->
+            <a href="{% url 'app:category' category.name %}">{{ category.name }}</a>
+            {% if category.description %}
+                - {{ category.description }}
+            {% endif %}
+        </li>
+        {% empty %}
+        <!-- If there are no categories, display a default message-->
+         <li>No categories found.</li>
+         {% endfor %}
+    </ul>
+{% endblock %}

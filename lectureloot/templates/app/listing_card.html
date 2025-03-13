@@ -4,7 +4,7 @@
     {% endif %}
     <div class="card-body">
         <h5 class="card-title">{{ listing.title }}</h5>
-        <p class="card-text">Price: ${{ listing.price }}</p>
+        <p class="card-text">Highest bid: ${{ listing.highest_bid.amount }}</p>
         <a href="{% url 'app:listing_detail' listing.id %}" class="btn btn-primary">View More</a>
     </div>
 </div>

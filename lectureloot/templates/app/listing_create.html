@@ -9,6 +9,9 @@
         <!--Render all form fields as paragraphs-->
         {{ form.as_p }}
 
+        <label for="price">Price: £</label>
+        <input name="price" type="number" min="0" step=".01">
+
         <h2>Upload Media (Images/Videos)</h2>
         {{ media_formset.management_form }}
         

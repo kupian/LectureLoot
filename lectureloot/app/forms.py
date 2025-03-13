@@ -5,7 +5,7 @@ from .models import Listing, Media
 class ListingForm(forms.ModelForm):
     class Meta:
         model = Listing 
-        fields = ['title', 'price', 'category', 'description']
+        fields = ['title', 'category', 'description']
 
 # Media form under listing form
 class MediaForm(forms.ModelForm):
