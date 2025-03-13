@@ -158,8 +158,8 @@ def submit_bid(request, listing_id):
     }, status=403)
   
   try:
-    highest_bid_amount = Bid.objects.all().order_by('-amount')[0].amount
-  except IndexError:
+    highest_bid_amount = listing.highest_bid.amount
+  except AttributeError:
     highest_bid_amount = 0
 
   if amount <= highest_bid_amount:
@@ -170,7 +170,7 @@ def submit_bid(request, listing_id):
   bid = Bid(listing=listing, user=request.user, amount=amount)
   bid.save()
   
-  listing.price = bid.amount
+  listing.highest_bid = bid
   listing.save()
   
   return JsonResponse({

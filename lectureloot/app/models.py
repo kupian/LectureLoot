@@ -4,6 +4,8 @@ from django.conf import settings
 from datetime import datetime, timedelta
 
 # User Model
+class Bid():
+    pass
 class CustomUser(AbstractUser):
     # decimal field to store the user rating (e.g., 0.00 to 5.00)
     rating = models.DecimalField(
@@ -47,7 +49,7 @@ class Listing(models.Model):
     # title of the listing
     title = models.CharField(max_length = 255)
     # price of the item, stored as a decimal number
-    price = models.DecimalField(max_digits = 8, decimal_places = 2)
+    highest_bid = models.OneToOneField("Bid", null=True, on_delete=models.SET_NULL, related_name="listing")
     # category
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category", help_text="Category of item")
     # optional description of the item
@@ -74,7 +76,6 @@ class Listing(models.Model):
         
 # define a new model to represent Bid
 class Bid(models.Model):
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, blank=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=False)
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=6)
     time = models.DateField(auto_now=True)
