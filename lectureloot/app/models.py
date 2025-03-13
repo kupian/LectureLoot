@@ -96,5 +96,5 @@ class Bid(models.Model):
     time = models.DateField(auto_now=True)
     
     def __str__(self):
-        return f"Bid on {self.listing} for £{self.amount}"
+        return f"Bid for £{self.amount}"
     

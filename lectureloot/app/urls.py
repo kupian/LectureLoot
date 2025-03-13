@@ -23,4 +23,5 @@ urlpatterns = [
   path('category/<str:name>/', views.category, name='category'),
   path('bid/<int:listing_id>', views.submit_bid, name="submit_bid"),
   path('merchant/<str:username>/', views.merchant, name="merchant"),
+  path('highest-bid/<int:listing_id>', views.highest_bid, name="highest_bid")
 ]

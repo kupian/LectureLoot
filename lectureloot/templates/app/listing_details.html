@@ -53,9 +53,8 @@
 		<div class="col-md-4">
 			<div class="p-4 border rounded">
 				<p class="fw-bold mb-2">Highest bid:</p>
-				<h2 id="highestBid" class="text-primary">£{{ listing.price }}</h2>
+				<h2 id="highestBid" class="text-primary">£{{ listing.highest_bid.amount }}</h2>
         <h3 id="winning"></h3>
-        <h3>Ends in: <span id="countdown"></span></h3>
 
 				<div class="d-grid gap-2">
 					<button class="btn btn-primary-dark">Contact seller</button>
@@ -64,7 +63,7 @@
 				<hr />
 
 				<p class="fw-bold mb-2">Bidding ends:</p>
-				<p>{{ listing.end_time|date:"d/m/Y, g:i A T" }}</p>
+				<p id="countdown"></p>
 
 				<div class="d-grid gap-2">
 					<form method="POST" id="bidForm">
@@ -129,23 +128,19 @@
         calculateTime();
         const timer = setInterval(calculateTime, 1000);
     }
-  
-    function getHighestBidPeriodic() {
-      let interval = 60000;
-      let finalMinute = false;
-      
-      function getHighestBid() {
+
+    function getHighestBid() {
         $.ajax({
                 type: "POST",
                 url: "/highest-bid/{{ listing.id }}",
                 data: {
                     csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
                 },
-                success: function(data) {
-                  let res = $.parseJSON(data.responseText);
-                    $("#highestBid").text(res.amount);
-                    if(res.userId == {{ user.id }}) {
-                      $("#highestBid").text("You are the highest bidder!");
+                success: function(res) {
+                    $("#highestBid").text(`£${res.amount}`);
+                    
+                    if(res.user_id == {{ user.id }}) {
+                      $("#winning").text("You are the highest bidder!");
                     }
                 }
             });
@@ -157,6 +152,10 @@
           highestBidTimer = setInterval(getHighestBid, interval);
         }
       }
+  
+    function getHighestBidPeriodic() {
+      let interval = 60000;
+      let finalMinute = false;
       
       getHighestBid();
       let highestBidTimer = setInterval(getHighestBid, interval);
@@ -177,8 +176,7 @@
                     csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
                 },
                 success: function() {
-                    var amount = $("#amount").val();
-                    $("#highestBid").text(`£${amount} - You are the highest bidder!`);
+                    getHighestBid();
                 },
                 error: function(e) {
                     $("#message").text($.parseJSON(e.responseText).message);

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.utils.timezone import now
 from .models import Listing, Category, Bid, CustomUser, Media
-from .forms import ListingForm, MediaForm MediaFormSet
+from .forms import ListingForm, MediaForm, MediaFormSet
 
 # Listing view
 def listing_detail(request, pk):
@@ -40,6 +40,11 @@ def listing_create(request):
       # set the seller to the currently logged in user
       new_listing.seller = request.user
       # save the listing to the database
+      
+      dummy_bid = Bid(user=request.user, amount=request.POST["price"])
+      dummy_bid.save()
+      new_listing.highest_bid = dummy_bid
+      
       new_listing.save()
 
       # Save media files associated with the listing
@@ -204,3 +209,20 @@ def merchant(request, username):
     }
 
   return render(request, "app/merchant.html", context)
+
+def highest_bid(request, listing_id):
+  listing = Listing.objects.get(pk=listing_id)
+  if listing is None:
+    return JsonResponse({
+    "message": "Invalid listing"
+    }, status=403)
+    
+  amount = listing.highest_bid.amount
+  user_id = listing.highest_bid.user.id
+  
+  context_dict = {
+    "amount": amount,
+    "user_id": user_id
+  }
+  
+  return JsonResponse(context_dict)
