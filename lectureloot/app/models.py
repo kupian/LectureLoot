@@ -54,12 +54,6 @@ class Listing(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category", help_text="Category of item")
     # optional description of the item
     description = models.TextField(blank = True, null = True)
-    # optional image for the listing; images will be uploaded to 'listing_images/'
-    image = models.ImageField(
-        upload_to = 'listing_images/',
-        blank = True,
-        null = True
-    )
 
     # automatically set the time when the listing is created 
     created_at = models.DateTimeField(auto_now_add = True)
@@ -73,8 +67,29 @@ class Listing(models.Model):
     def __str__(self):
         # display the listing title along with the sellers username for clarity
         return f"{self.title} (Seller: {self.seller.username})"
-        
-# define a new model to represent Bid
+    
+# Many to one media (includes image and video)
+class Media(models.Model):
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='media')
+
+    file = models.FileField(upload_to='listing_media/')
+    
+    media_type = models.CharField(max_length=10, choices=[('image', 'Image'), ('video', 'Video')])
+
+    # code that automatically detects file type and saves it
+    def save(self, *args, **kwargs):
+        if self.file:
+            if self.file.name.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.bmp')):
+                self.media_type = 'image'
+            elif self.file.name.lower().endswith(('.mp4', '.mov', '.avi', '.mkv')):
+                self.media_type = 'video'
+            else:
+                raise ValueError('Unsupported file format')
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Media for {self.listing.title} ({self.media_type})"
+      
 class Bid(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=False)
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=6)
