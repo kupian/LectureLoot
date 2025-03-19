@@ -77,6 +77,7 @@ class Listing(models.Model):
 # define a new model to represent Bid
 class Bid(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=False)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bid_set')
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=6)
     time = models.DateField(auto_now=True)
     
