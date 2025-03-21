@@ -104,6 +104,8 @@ def add_dummy_bid(listing, price):
     # currently using: listing seller -- can be adjusted if needed.
     dummy_bid = Bid.objects.get_or_create(listing=listing, user=listing.seller, amount=price)[0]
     dummy_bid.save()
+    listing.highest_bid = dummy_bid
+    listing.save()
     return dummy_bid
 
 # Start execution
