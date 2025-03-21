@@ -67,7 +67,18 @@ def listing_create(request):
 
 # index view
 def index(request):
-  return render(request, "app/index.html")
+    # get top 10 listings ending soon
+    ending_soon = Listing.objects.filter(end_datetime__gt=now()).order_by('end_datetime')[:10]
+
+    # get listings by category
+    categories = Category.objects.all()
+    category_listings = {category: Listing.objects.filter(category=category)[:5] for category in categories}
+
+    context = {
+        "ending_soon": ending_soon,
+        "category_listings": category_listings
+    }
+    return render(request, "app/index.html", context)
 
 @login_required
 # profile view
