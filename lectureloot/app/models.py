@@ -3,9 +3,6 @@ from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from datetime import datetime, timedelta
 
-# User Model
-class Bid():
-    pass
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=50)
@@ -55,7 +52,7 @@ class Listing(models.Model):
     # title of the listing
     title = models.CharField(max_length = 255)
     # price of the item, stored as a decimal number
-    highest_bid = models.OneToOneField("Bid", null=True, on_delete=models.SET_NULL, related_name="listing")
+    highest_bid = models.OneToOneField("Bid", null=True, on_delete=models.SET_NULL, related_name="winning_listing")
     # category
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category", help_text="Category of item")
     # optional description of the item
@@ -98,7 +95,7 @@ class Media(models.Model):
       
 class Bid(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, blank=False)
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bid_set')
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name="bids")
     amount = models.DecimalField(blank=False, decimal_places=2, max_digits=6)
     time = models.DateField(auto_now=True)
     

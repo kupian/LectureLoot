@@ -72,7 +72,7 @@ def populate():
     for c in Category.objects.all():
         for listing in Listing.objects.filter(category=c):
             print(f'- {c}: {listing}')
-            for bid in listing.bid_set.all():
+            for bid in Bid.objects.filter(listing=listing):
                 print(f'    - Dummy Bid by {bid.user}: £{bid.amount}')
 
 def add_listing(cat, title, url, seller_id, views=0, description="", image_path=None):
@@ -102,7 +102,7 @@ def add_category(name):
 def add_dummy_bid(listing, price):
     # create a dummy bid for the listing with the provided price. 
     # currently using: listing seller -- can be adjusted if needed.
-    dummy_bid = Bid.objects.get_or_create(listing=listing, bidder=listing.seller, amount=price) [0]
+    dummy_bid = Bid.objects.get_or_create(listing=listing, user=listing.seller, amount=price)[0]
     dummy_bid.save()
     return dummy_bid
 
@@ -110,8 +110,3 @@ def add_dummy_bid(listing, price):
 if __name__ == '__main__':
     print('Starting App population script...')
     populate()
-    
-    
-
-
-    
