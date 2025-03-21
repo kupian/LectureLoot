@@ -18,8 +18,11 @@ urlpatterns = [
   # View to create a new listing; only accessible by logged-in users
   path('listing/new/', views.listing_create, name='listing_create'),
   path('search/<str:query>/', views.search, name="search"),
+  path('logout/', views.logout, name='logout'),
   # URL pattern for the categories page
   path('categories/', views.categories, name='categories'),
   path('category/<str:name>/', views.category, name='category'),
   path('bid/<int:listing_id>', views.submit_bid, name="submit_bid"),
+  path('merchant/<str:username>/', views.merchant, name="merchant"),
+  path('highest-bid/<int:listing_id>', views.highest_bid, name="highest_bid")
 ]

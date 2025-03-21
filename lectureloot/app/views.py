@@ -1,10 +1,13 @@
+from django.forms import modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from django.http import JsonResponse
+from .models import Listing, CustomUser, Category, Bid, Media
+from .forms import ListingForm, UserForm, UserProfileForm, MediaForm, MediaFormSet 
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.contrib import messages
+from django.http import HttpResponse, JsonResponse
 from django.utils.timezone import now
-from .models import Listing, Category, Bid
-from .forms import ListingForm 
 
 # Listing view
 def listing_detail(request, pk):
@@ -14,8 +17,11 @@ def listing_detail(request, pk):
   """
   # retrieve the listing; if not found, return a 404 error
   listing = get_object_or_404(Listing, pk = pk)
+
+  media = Media.objects.filter(listing=listing)
+
   # render the 'listing_detail.html' template with the listing context
-  return render(request, 'app/listing_details.html', {'listing':listing})
+  return render(request, 'app/listing_details.html', {'listing':listing,'media':media})
 
 @login_required
 def listing_create(request):
@@ -27,51 +33,94 @@ def listing_create(request):
   if request.method == 'POST':
     # create a form instance with the POST data and uploaded files
     form = ListingForm(request.POST, request.FILES)
+    files = [file for key, file in request.FILES.items() if key.startswith('form-') and key.endswith('-file')]
+    print(files)
+
     if form.is_valid():
       # create a new listing instance without saving to the database
       new_listing = form.save(commit = False)
       # set the seller to the currently logged in user
       new_listing.seller = request.user
       # save the listing to the database
+      
+      dummy_bid = Bid(user=request.user, amount=request.POST["price"])
+      dummy_bid.save()
+      new_listing.highest_bid = dummy_bid
+      
       new_listing.save()
+
+      # Save media files associated with the listing
+      for file in files:       
+        media_type = 'video' if file.content_type.startswith('video') else 'image'
+        Media.objects.create(listing=new_listing, file=file, media_type=media_type)
+
       # redirect to the detail view for the newly created listing
       return redirect('app:listing_detail', pk = new_listing.pk)
   else:
     # if GET request, create an empty form
     form = ListingForm()
+    MediaFormSet = modelformset_factory(Media, form=MediaForm, extra=1, max_num=10, can_delete=True)
+    media_formset = MediaFormSet(queryset=Media.objects.none())
+
   # render the 'listing_create.html' template with the form context
-  return render(request, 'app/listing_create.html', {'form':form})
+  return render(request, 'app/listing_create.html', {'form':form,'media_formset':media_formset})
 
 # index view
 def index(request):
   return render(request, "app/index.html")
 
+@login_required
 # profile view
 def profile(request):
-  context_dict = {
-    'user': {
-      'name': "Example Name",
-      'email': "example@domain.com",
-      'username': "ExampleUserName",
-      'rating': 4.7 
-    }
-  }
-  return render(request, "app/profile.html", context=context_dict)
+  form = UserProfileForm()
+  if request.method == "POST":
+    form = UserProfileForm(request.POST, request.FILES)
+    if form.is_valid():
+      user_profile = form.save(commit=False)
+      user_profile.user = request.user
+      user_profile.save()
+      print(user_profile)
+      return redirect('app:index')
+    else:
+      print(form.errors)
+  context_dict = {'form': form}
+  return render(request, "app/profile.html", context_dict)
 
 # register view
 def register(request):
-  context_dict = {
-    'register': True,
-    'values': {
-      'firstName': "",
-      'familyName': "",
-      'email': "",
-      'username': "",
-    }
-  }
-  
-  return render(request, "app/register.html", context=context_dict)
+  register = True
+  if request.method == 'POST':
+    first_name = request.POST.get("first_name")
+    last_name = request.POST.get("last_name")
+    username = request.POST.get("username")
+    email = request.POST.get("email")
+    password1 = request.POST.get("password1")
+    password2 = request.POST.get("password2")
 
+    if password1 != password2:
+      messages.error(request, "Passwords do not match")
+    if CustomUser.objects.filter(email=email).exists():
+      messages.error(request, "Username already already in use")    
+    if CustomUser.objects.filter(username=username).exists():
+      messages.error(request, "Username already already in use") 
+
+    user = CustomUser.objects.create_user(
+      first_name=first_name,
+      last_name=last_name,
+      username=username,
+      email=email,
+      password=password1
+    )
+    user.save()
+    user = authenticate(request, username=email, password=password1)
+    if user:
+      auth_login(request, user)
+      return redirect("app:index")
+
+  return render(request, "app/register.html", context={"register": register})
+
+
+@login_required
 # edit profile view
 def edit_profile(request):
   context_dict = {
@@ -88,6 +137,18 @@ def edit_profile(request):
 
 # login view
 def login(request):
+  if request.method == 'POST':
+    email = request.POST.get("email")
+    password = request.POST.get('password1') 
+    user = authenticate(request, username=email, password=password)
+    if user:
+      if user.is_active:
+        auth_login(request, user)
+        return redirect("app:index")
+      else:
+        messages.error(request, "User is not active")
+    else:
+      messages.error(request, "Invalid login details")     
   return render(request, "app/login.html")
 
 # change password view
@@ -110,6 +171,11 @@ def search(request, query):
   
   return render(request, "app/search.html", context)
 
+@login_required
+def logout(request):
+  auth_logout(request)
+  return redirect("app:index")
+  
 # categories list
 def categories(request):
   '''Retrieve all Category objects from the database and render the categories page'''
@@ -176,4 +242,32 @@ def submit_bid(request, listing_id):
   return JsonResponse({
     "message": "success"
   })
+
+def merchant(request, username):
+  media_path = settings.MEDIA_URL
+
+  if username: 
+    user = get_object_or_404(CustomUser, username=username)
+    
+    context = {
+      "user": user
+    }
+
+  return render(request, "app/merchant.html", context)
+
+def highest_bid(request, listing_id):
+  listing = Listing.objects.get(pk=listing_id)
+  if listing is None:
+    return JsonResponse({
+    "message": "Invalid listing"
+    }, status=403)
+    
+  amount = listing.highest_bid.amount
+  user_id = listing.highest_bid.user.id
   
+  context_dict = {
+    "amount": amount,
+    "user_id": user_id
+  }
+  
+  return JsonResponse(context_dict)
