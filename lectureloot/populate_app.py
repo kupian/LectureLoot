@@ -1,10 +1,12 @@
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lectureloot.settings')
-
 import django
 django.setup()
-from app.models import Category, Listing, CustomUser, Bid
+from app.models import Category, Listing, CustomUser, Bid, Media
 from django.core.files import File
+from django.conf import settings
+from django.core.exceptions import SuspiciousFileOperation
+import pathlib
 
 def populate():
     # create or get the seller
@@ -13,33 +15,33 @@ def populate():
     seller_id = seller.pk
     # update data dictionaries with the new "description" field.
     stationery_pages = [
-    {'title': 'Pencil', 'url': 'http://stationaryURL1/', 'seller_id': seller_id, 'description': 'A high-quality pencil', 'image':'listing_images/pencil.jpg'},
-    {'title': 'Highlighter', 'url': 'http://stationaryURL2/', 'seller_id': seller_id, 'description': 'Bright highlighter for notes', 'image':'listing_images/highlighter.jpg'}
+    {'title': 'Pencil', 'url': 'http://stationaryURL1/', 'seller_id': seller_id, 'description': 'A high-quality pencil', 'image':f'pencil.jpg'},
+    {'title': 'Highlighter', 'url': 'http://stationaryURL2/', 'seller_id': seller_id, 'description': 'Bright highlighter for notes', 'image':f'highlighter.jpg'}
     ]
 
     tech_pages = [
-        {'title': 'Computer', 'url': 'http://www.techURL1/', 'seller_id': seller_id, 'description': 'Powerful desktop computer', 'image':'listing_images/computer.jpg'},
-        {'title': 'Headphones', 'url': 'http://www.techURL2/', 'seller_id': seller_id, 'description': 'Noise-cancelling headphones', 'image':'listing_images/headphones.jpg'}
+        {'title': 'Computer', 'url': 'http://www.techURL1/', 'seller_id': seller_id, 'description': 'Powerful desktop computer', 'image':f'computer.jpg'},
+        {'title': 'Headphones', 'url': 'http://www.techURL2/', 'seller_id': seller_id, 'description': 'Noise-cancelling headphones', 'image':f'headphones.jpg'}
     ]
 
     toys_pages = [
-        {'title': 'Ball', 'url': 'http://toysURL1', 'seller_id': seller_id, 'description': 'Bouncy ball for play', 'image':'listing_images/ball.jpg'},
-        {'title': 'Play-Dough', 'url': 'http://toysURL2', 'seller_id': seller_id, 'description': 'Colorful play-dough', 'image':'listing_images/playdough.jpg'}
+        {'title': 'Ball', 'url': 'http://toysURL1', 'seller_id': seller_id, 'description': 'Bouncy ball for play', 'image':f'ball.jpg'},
+        {'title': 'Play-Dough', 'url': 'http://toysURL2', 'seller_id': seller_id, 'description': 'Colorful play-dough', 'image':f'playdough.jpg'}
     ]
 
     entertainment_pages = [
-        {'title': 'Puzzle', 'url': 'http://entertainmentURL1', 'seller_id': seller_id, 'description': 'Challenging jigsaw puzzle', 'image':'listing_images/puzzle.jpg'},
-        {'title': 'Nintendo Switch', 'url': 'http://entertainmentURL2', 'seller_id': seller_id, 'description': 'Popular gaming console', 'image':'listing_images/nintendo.jpg'}
+        {'title': 'Puzzle', 'url': 'http://entertainmentURL1', 'seller_id': seller_id, 'description': 'Challenging jigsaw puzzle', 'image':f'puzzle.jpg'},
+        {'title': 'Nintendo Switch', 'url': 'http://entertainmentURL2', 'seller_id': seller_id, 'description': 'Popular gaming console', 'image':f'nintendo.jpg'}
     ]
 
     books_pages = [
-        {'title': 'Harry Potter', 'url': 'http://booksURL1', 'seller_id': seller_id, 'description': 'Fantasy novel series', 'image':'listing_images/book1.jpg'},
-        {'title': 'Java for Beginners', 'url': 'http://booksURL2', 'seller_id': seller_id,'description': 'Introductory programming book', 'image':'listing_images/book2.jpg'}
+        {'title': 'Harry Potter', 'url': 'http://booksURL1', 'seller_id': seller_id, 'description': 'Fantasy novel series', 'image':f'book1.jpg'},
+        {'title': 'Java for Beginners', 'url': 'http://booksURL2', 'seller_id': seller_id,'description': 'Introductory programming book', 'image':f'book2.jpg'}
     ]
 
     food_pages = [
-        {'title': 'Pasta Noodles', 'url': 'http://foodURL1', 'seller_id': seller_id, 'description': 'Delicious pasta noodles', 'image':'listing_images/pasta.jpg'},
-        {'title': 'Canned Beets', 'url': 'http://foodURL2', 'seller_id': seller_id, 'description': 'Healthy canned beets', 'image':'listing_images/beets.jpg'}
+        {'title': 'Pasta Noodles', 'url': 'http://foodURL1', 'seller_id': seller_id, 'description': 'Delicious pasta noodles', 'image':f'pasta.jpg'},
+        {'title': 'Canned Beets', 'url': 'http://foodURL2', 'seller_id': seller_id, 'description': 'Healthy canned beets', 'image':f'beets.jpg'}
     ]
     
     cats = {'Stationery': {'pages': stationery_pages},
@@ -85,10 +87,14 @@ def add_listing(cat, title, url, seller_id, views=0, description="", image_path=
     # attach media file if image_path is provided
     if image_path:
         # construct the full path to the media file.
-        full_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), image_path)
+        safe_filename = pathlib.Path(image_path).name
+        full_path = f"media/example_images/{safe_filename}"
+        
         if os.path.exists(full_path):
             with open(full_path, 'rb') as f:
-                listing.image.save(os.path.basename(image_path), File(f), save=False)
+                file = File(f)
+                media = Media(listing=listing, file=file, media_type="image")
+                media.save()
         else:
             print(f"Image file not found: {full_path}")
     listing.save()

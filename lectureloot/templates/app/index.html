@@ -1,6 +1,61 @@
-{% extends 'app/base.html' %}
+{% extends "app/base.html" %}
 {% load static %}
+{% load listing_card %}
 
 {% block body_block %}
-  Index
+<div class="container mt-4">
+
+    <div class="text-center mb-4">
+        <h1>Welcome to LectureLoot</h1>
+        <p>Find great deals from students around Glasgow. Browse by category or check out auctions ending soon!</p>
+        <a href="{% url 'app:listing_create' %}" class="btn btn-primary">Create a New Listing</a>
+    </div>
+
+    <!-- ending soon carousel -->
+    <h2 class="mt-4">Ending Soon</h2>
+    <div id="endingSoonCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            {% for listing in ending_soon %}
+              <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                <div class="d-flex justify-content-center">
+                    {% render_listing listing %}
+                </div>
+              </div>
+            {% empty %}
+                <p>No listings ending soon.</p>
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#endingSoonCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#endingSoonCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <!-- Category Sections -->
+    {% for category, listings in category_listings.items %}
+        <h2 class="mt-5">{{ category.name }}</h2>
+        <div id="categoryCarousel{{ category.id }}" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                {% for listing in listings %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <div class="d-flex justify-content-center">
+                            {% render_listing listing %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No listings in this category.</p>
+                {% endfor %}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#categoryCarousel{{ category.id }}" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#categoryCarousel{{ category.id }}" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+        </div>
+    {% endfor %}
+
+</div>
 {% endblock %}
