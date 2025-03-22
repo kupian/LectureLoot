@@ -66,3 +66,9 @@
   background: white;
   border-radius: 8px;
 }
+
+.fixed-height {
+  height: 200px; /* You can adjust this value to the desired height */
+  width: auto;   /* Ensures the aspect ratio is maintained */
+  object-fit: cover; /* Optionally, this ensures the image fills the container while maintaining its aspect ratio */
+}

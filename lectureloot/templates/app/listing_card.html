@@ -1,6 +1,22 @@
+{% load static %}
+
+<style>
+    .fixed-height {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+    }
+</style>
+
 <a href="{% url 'app:listing_detail' listing.id %}" class="text-decoration-none text-dark">
     <div class="card">
-        <img src="{{ listing.image.url }}" class="card-img-top" alt="{{ listing.title }}">
+        {% with listing.media.first as media %}
+            {% if media %}
+                <img src="{{ media.file.url }}" class="card-img-top fixed-height" alt="{{ listing.title }}">
+            {% else %}
+                <img src="{% static 'images/placeholder.png' %}" class="card-img-top fixed-height" alt="No image available">
+            {% endif %}
+        {% endwith %}
         <div class="card-body">
             <h5 class="card-title">{{ listing.title }}</h5>
             <p class="card-text">Highest bid: ${{ listing.highest_bid.amount }}</p>
