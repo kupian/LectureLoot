@@ -19,7 +19,7 @@
         {% endwith %}
         <div class="card-body">
             <h5 class="card-title">{{ listing.title }}</h5>
-            <p class="card-text">Highest bid: ${{ listing.highest_bid.amount }}</p>
+            <p class="card-text">Highest bid: £{{ listing.highest_bid.amount }}</p>
             <p class="card-text text-danger">Ends: {{ listing.end_datetime }}</p>
             <a href="{% url 'app:listing_detail' listing.id %}" class="btn btn-primary">View More</a>
         </div>
