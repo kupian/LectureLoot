@@ -29,7 +29,7 @@ SECRET_KEY = '6_+ri%r5kcw$fp5ba815yxdqjsa(3+@rb*$in31=i-e^el=jm!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["kupian.pythonanywhere.com"]
 
 
 # Application definition
