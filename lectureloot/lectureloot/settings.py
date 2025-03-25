@@ -29,7 +29,7 @@ SECRET_KEY = '6_+ri%r5kcw$fp5ba815yxdqjsa(3+@rb*$in31=i-e^el=jm!'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["kupian.pythonanywhere.com"]
+ALLOWED_HOSTS = ["kupian.pythonanywhere.com", "127.0.0.1"]
 
 
 # Application definition
@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'utils.context_processors.notification_count'
             ],
         },
     },

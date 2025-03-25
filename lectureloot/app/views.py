@@ -2,7 +2,7 @@ from django.forms import modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
-from .models import Listing, CustomUser, Category, Bid, Media
+from .models import Listing, CustomUser, Category, Bid, Media, Notification
 from .forms import ListingForm, UserForm, UserProfileForm, MediaForm, MediaFormSet 
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib import messages
@@ -282,3 +282,26 @@ def highest_bid(request, listing_id):
   }
   
   return JsonResponse(context_dict)
+
+@login_required
+def notifications(request):
+    """display user notifications and mark as read"""
+    
+    user_notifications = Notification.objects.filter(user=request.user)
+    
+    # mark as read
+    unread_notifications = user_notifications.filter(read=False)
+    unread_notifications.update(read=True)
+    
+    return render(request, 'app/notifications.html', {
+        'notifications': user_notifications
+    })
+    
+@login_required
+def clear_notifications(request):
+  """remove all notifications"""
+  user_notifications = Notification.objects.filter(user=request.user)
+  user_notifications.delete()
+  return render(request, 'app/notifications.html', {
+        'notifications': user_notifications
+    })

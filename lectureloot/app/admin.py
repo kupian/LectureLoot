@@ -1,5 +1,5 @@
 from django.contrib import admin
-from app.models import Category, Listing, CustomUser, Media, Bid
+from app.models import Category, Listing, CustomUser, Media, Bid, Notification
 
 class ListingAdmin(admin.ModelAdmin):
   list_display = ('title', 'category', 'id')
@@ -17,4 +17,5 @@ admin.site.register(Listing, ListingAdmin)
 admin.site.register(CustomUser)
 admin.site.register(Media, MediaAdmin)
 admin.site.register(Bid)
+admin.site.register(Notification)
 

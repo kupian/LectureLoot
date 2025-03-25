@@ -42,6 +42,18 @@
 
       </ul>
 
+      <!-- Notification Button -->
+      <a href="/notifications" class="me-2">
+        <button class="btn btn-light rounded-circle px-0 py-0 position-relative">
+          <img src="{% static 'icons/bell.svg' %}" alt="Notifications">
+          {% if notifications_count > 0 %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ notifications_count }}
+            </span>
+          {% endif %}
+        </button>
+      </a>
+
       <!-- Search Bar -->
       <form class="d-flex me-3" role="search" method="GET" id="search">
         <input class="form-control rounded-pill me-2" type="search" placeholder="Search..." aria-label="Search" id="query">
