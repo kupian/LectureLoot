@@ -1,10 +1,16 @@
 {% extends 'app/base.html' %}
 {% load static %}
 {% load listing_card %}
+{% load sort_dropdown %}
 
 {% block body_block %}
 <div class="container mt-4">
-    <h2>Search Results for "{{ query }}"</h2>
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h2>Search Results for "{{ query }}"</h2>
+        </div>
+        {% sort_dropdown sort_by %}
+    </div>
     
     {% if results %}
         <div class="row g-4">

@@ -9,6 +9,18 @@ from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.utils.timezone import now
 
+# sort query matches by a query
+def sort(query_matches, sort_by):
+  if sort_by == "title":
+    query_matches = query_matches.order_by("title")
+  elif sort_by == "price_low":
+    query_matches = query_matches.order_by("highest_bid__amount")
+  elif sort_by == 'price_high':
+    query_matches = query_matches.order_by('-highest_bid__amount')
+  elif sort_by == 'end_datetime':
+    query_matches = query_matches.order_by('end_datetime')
+  return query_matches
+
 # Listing view
 def listing_detail(request, pk):
   """
@@ -173,9 +185,14 @@ def search(request, query):
   if query:
     query_matches = Listing.objects.filter(title__icontains=query)
     
+    # handle sorting
+    sort_by = request.GET.get("sort_by", "end_datetime")
+    query_matches = sort(query_matches, sort_by)
+    
     context = {
       "query": query,
       "results": query_matches,
+      "sort_by": sort_by
     }
     
     print(query_matches)
@@ -210,9 +227,13 @@ def category(request, name):
   else:
     listings = Listing.objects.filter(category = category)
     
+    sort_by = request.GET.get("sort_by", "end_datetime")
+    listings = sort(listings, sort_by)
+    
   context = {
     "name": name,
     "listings": listings,
+    "sort_by": sort_by
   }
   return render(request, 'app/category.html', context=context)
 
