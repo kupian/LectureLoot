@@ -29,6 +29,16 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.email
     
+    def save(self, *args, **kwargs):
+        # override save to generate a welcome notification when user is first created
+        just_created = self.pk is None
+
+        super(CustomUser, self).save(*args, **kwargs)
+
+        if just_created:
+            welcome_message = Notification(user=self, title="Welcome", message=f"Welcome to LectureLoot, {self.first_name}")
+            welcome_message.save()
+    
 class Category(models.Model):
     MAX_NAME_LENGTH = 128
     name = models.CharField(max_length=MAX_NAME_LENGTH, unique=True)
@@ -102,3 +112,18 @@ class Bid(models.Model):
     def __str__(self):
         return f"Bid for £{self.amount}"
     
+class Notification(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='notifications')
+    title = models.CharField(max_length=255)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+    
+    # optional link to related listing
+    listing = models.ForeignKey(Listing, on_delete=models.SET_NULL, null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        
+    def __str__(self):
+        return f"{self.title} for {self.user.username}"
