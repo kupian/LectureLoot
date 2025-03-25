@@ -98,93 +98,22 @@
     </div>
   </div>
 
+
+{{ user.id|json_script:"user-id" }}
+{{ listing.end_datetime|date:'Y-m-d H:i:s'|json_script:"end-datetime" }}
+{{ listing.id|json_script:"listing-id" }}
+
 <script>
-    function getRemainingTime() {
-      const endTime = new Date("{{ listing.end_datetime|date:'Y-m-d H:i:s' }}").getTime();
-      const now = new Date().getTime();
-      const timeLeft = endTime - now;
-      return timeLeft;
-    }
+  // variables for external JS file
+  const userID = JSON.parse($('#user-id').text());
+  const endDateTime = JSON.parse($('#end-datetime').text());
+  const listingID = JSON.parse($('#listing-id').text());
   
-    function updateCountdown() {
-        const countdownElement = $("#countdown")[0];
-        
-        function calculateTime() {
-            const timeLeft = getRemainingTime()
-            
-            if (timeLeft > 0) {
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-                
-                countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-            } else {
-                countdownElement.innerHTML = "Listing Ended";
-                clearInterval(timer);
-            }
-        }
-        
-        calculateTime();
-        const timer = setInterval(calculateTime, 1000);
-    }
-
-    function getHighestBid() {
-        $.ajax({
-                type: "POST",
-                url: "/highest-bid/{{ listing.id }}",
-                data: {
-                    csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
-                },
-                success: function(res) {
-                    $("#highestBid").text(`£${res.amount}`);
-                    
-                    if(res.user_id == {{ user.id }}) {
-                      $("#winning").text("You are the highest bidder!");
-                    }
-                }
-            });
-        
-        if (getRemainingTime() < 60000 && !finalMinute) {
-          finalMinute = true;
-          interval = 1000;
-          clearInterval(highestBidtimer);
-          highestBidTimer = setInterval(getHighestBid, interval);
-        }
-      }
-  
-    function getHighestBidPeriodic() {
-      let interval = 60000;
-      let finalMinute = false;
-      
-      getHighestBid();
-      let highestBidTimer = setInterval(getHighestBid, interval);
-    }
-    
-    $(document).ready(function() {
-        updateCountdown();
-        getHighestBidPeriodic();
-
-        $("#bidForm").submit(function(e) {
-            e.preventDefault();
-
-            $.ajax({
-                type: "POST",
-                url: "/bid/{{ listing.id }}",
-                data: {
-                    amount: $("#amount").val(),
-                    csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
-                },
-                success: function() {
-                    getHighestBid();
-                },
-                error: function(e) {
-                    $("#message").text($.parseJSON(e.responseText).message);
-                    const myModal = new bootstrap.Modal($("#errorModal"));
-                    myModal.show();
-                }
-            });
-        });
-    });
+  console.log("User ID:", userID);
+  console.log("End DateTime:", endDateTime);
+  console.log("Listing ID:", listingID);
 </script>
+
+
+<script type="text/javascript" src="{% static 'js/bidding.js' %}"></script>
 {% endblock %}
