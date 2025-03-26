@@ -1,0 +1,37 @@
+{% extends 'app/base.html' %}
+{% load static %}
+{% load listing_card %}
+{% load sort_dropdown %}
+
+{% block title_block %}About LectureLoot{% endblock %}
+
+{% block body_block %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>About LectureLoot</h1>
+        </div>
+    </div>
+
+    <section id="introduction" class="mb-4">
+        <h2>Welcome to LectureLoot</h2>
+        <p>
+            LectureLoot is your go-to platform for buying and bidding on products from other students at the University of Glasgow.
+        </p>
+    </section>
+
+    <section id="mission" class="mb-4">
+        <h2>Our Mission</h2>
+        <p>
+            We strive to reduce waste from the council's garbage bins by providing a platform for students to dispose of unwanted items.
+        </p>
+    </section>
+
+    <section id="contact">
+        <h2>Contact Us</h2>
+        <p>
+            Questions or Comments? Reach out to us at <a href="mailto:contact@lectureloot.com">contact@lectureloot.com</a>
+        </p>
+    </section>
+</div>
+{% endblock %}

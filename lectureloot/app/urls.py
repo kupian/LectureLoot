@@ -27,4 +27,6 @@ urlpatterns = [
   path('highest-bid/<int:listing_id>', views.highest_bid, name="highest_bid"),
   path('notifications/', views.notifications, name='notifications'),
   path('clear-notifications/', views.clear_notifications, name='clear_notifications'),
+  #URL pattern for the About page
+  path('about/', views.about, name='about'),
 ]
