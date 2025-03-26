@@ -21,4 +21,7 @@
          <li>No categories found.</li>
          {% endfor %}
     </ul>
+        <div class="text-center mb-4">
+        <a href="{% url 'app:listing_create' %}" class="btn btn-primary">Create a New Listing</a>
+    </div>
 {% endblock %}
