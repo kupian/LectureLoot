@@ -95,8 +95,8 @@ def index(request):
     }
     return render(request, "app/index.html", context)
 
-@login_required
 # profile view
+@login_required
 def profile(request):
   form = UserProfileForm()
   if request.method == "POST":
@@ -109,7 +109,8 @@ def profile(request):
       return redirect('app:index')
     else:
       print(form.errors)
-  context_dict = {'form': form}
+  user_listings = Listing.objects.filter(seller=request.user)
+  context_dict = {'form': form, 'listings': user_listings}
   return render(request, "app/profile.html", context_dict)
 
 # register view
@@ -286,9 +287,11 @@ def merchant(request, username):
 
   if username: 
     user = get_object_or_404(CustomUser, username=username)
+    user_listings = Listing.objects.filter(seller=user)
     
     context = {
-      "user": user
+      "user": user,
+      "listings": user_listings
     }
 
   return render(request, "app/merchant.html", context)
@@ -332,22 +335,6 @@ def clear_notifications(request):
   return render(request, 'app/notifications.html', {
         'notifications': user_notifications
     })
-@login_required
-# profile view
-def profile(request):
-  form = UserProfileForm()
-  if request.method == "POST":
-    form = UserProfileForm(request.POST, request.FILES)
-    if form.is_valid():
-      user_profile = form.save(commit=False)
-      user_profile.user = request.user
-      user_profile.save()
-      print(user_profile)
-      return redirect('app:index')
-    else:
-      print(form.errors)
-  context_dict = {'form': form}
-  return render(request, "app/profile.html", context_dict)
  
 # register view
 def register(request):
