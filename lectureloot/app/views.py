@@ -8,7 +8,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib import messages
 from django.http import HttpResponse, JsonResponse
 from django.utils.timezone import now
-
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout, update_session_auth_hash
+ 
 # sort query matches by a query
 def sort(query_matches, sort_by):
   if sort_by == "title":
@@ -326,3 +327,114 @@ def clear_notifications(request):
   return render(request, 'app/notifications.html', {
         'notifications': user_notifications
     })
+@login_required
+# profile view
+def profile(request):
+  form = UserProfileForm()
+  if request.method == "POST":
+    form = UserProfileForm(request.POST, request.FILES)
+    if form.is_valid():
+      user_profile = form.save(commit=False)
+      user_profile.user = request.user
+      user_profile.save()
+      print(user_profile)
+      return redirect('app:index')
+    else:
+      print(form.errors)
+  context_dict = {'form': form}
+  return render(request, "app/profile.html", context_dict)
+ 
+# register view
+def register(request):
+  if request.method == "POST":
+    first_name = request.POST.get("first_name")
+    last_name = request.POST.get("last_name")
+    username = request.POST.get("username")
+    email = request.POST.get("email")
+    password1 = request.POST.get("password1")
+    password2 = request.POST.get("password2")
+ 
+    # Password validation
+    if password1 != password2:
+      messages.error(request, "Passwords do not match")
+      return redirect("app:register")
+ 
+    # Check if username/email already exists
+    if CustomUser.objects.filter(email=email).exists():
+      messages.error(request, "Email already in use")
+      return redirect("app:register")
+ 
+    if CustomUser.objects.filter(username=username).exists():
+      messages.error(request, "Username already already in use")
+      return redirect("app:register")
+      
+    # Create and save user
+    user = CustomUser.objects.create_user(
+      first_name=first_name,
+      last_name=last_name,
+      username=username,
+      email=email,
+      password=password1
+    )
+    auth_login(request, user)
+    return redirect("app:index")
+ 
+  return render(request, "app/register.html", {"register": True})
+ 
+@login_required
+# edit profile view
+def edit_profile(request):
+    user = request.user
+    if request.method == "POST":
+        form = UserForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, user)
+            return redirect("app:profile")
+        else:
+          messages.error(request, "SOmething already in use")
+ 
+        # else:
+        #     if CustomUser.objects.filter(username=user.email).exists():
+        #         messages.error(request, "Email already exists")
+        #     if CustomUser.objects.filter(username=user.username).exists():
+        #         messages.error(request, "Username already exists")
+    else:
+        form = UserForm(instance=user)
+    return render(request, "app/register.html", {"form": form, "register": False})
+ 
+# login view
+def login(request):
+  if request.method == 'POST':
+    email = request.POST.get("email")
+    password = request.POST.get('password1')
+    user = authenticate(request, username=email, password=password)
+    if user:
+      if user.is_active:
+        auth_login(request, user)
+        return redirect("app:index")
+      else:
+        messages.error(request, "User is not active")
+    else:
+      messages.error(request, "Invalid login details")     
+  return render(request, "app/login.html")
+ 
+# change password view
+def change_password(request):
+  if request.method == "POST":
+    current_password = request.POST.get('password')
+    new_password = request.POST.get('password1')
+    confirm_password = request.POST.get('password2')
+    user = request.user
+    if user.check_password(current_password):
+      if new_password == confirm_password:
+        user.set_password(new_password)
+        user.save()
+        update_session_auth_hash(request, user)
+        return redirect('app:profile')
+      else:
+        messages.error(request, "New passwords do not match")
+    else:
+      messages.error(request, "Incorrect current password")
+ 
+  return render(request, "app/change_password.html")
