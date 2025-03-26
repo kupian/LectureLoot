@@ -113,77 +113,8 @@ def profile(request):
   context_dict = {'form': form, 'listings': user_listings}
   return render(request, "app/profile.html", context_dict)
 
-# register view
-def register(request):
-  register = True
-  if request.method == 'POST':
-    first_name = request.POST.get("first_name")
-    last_name = request.POST.get("last_name")
-    username = request.POST.get("username")
-    email = request.POST.get("email")
-    password1 = request.POST.get("password1")
-    password2 = request.POST.get("password2")
-
-    if password1 != password2:
-      messages.error(request, "Passwords do not match")
-    if CustomUser.objects.filter(email=email).exists():
-      messages.error(request, "Username already already in use")    
-    if CustomUser.objects.filter(username=username).exists():
-      messages.error(request, "Username already already in use") 
-
-    user = CustomUser.objects.create_user(
-      first_name=first_name,
-      last_name=last_name,
-      username=username,
-      email=email,
-      password=password1
-    )
-    user.save()
-    user = authenticate(request, username=email, password=password1)
-    if user:
-      auth_login(request, user)
-      return redirect("app:index")
-
-  return render(request, "app/register.html", context={"register": register})
-
 def about(request):
   return render(request, 'app/about.html')
-
-
-@login_required
-# edit profile view
-def edit_profile(request):
-  context_dict = {
-    'register': False,
-    'values': {
-      'firstName': "Example",
-      'familyName': "Name",
-      'email': "example@domain.com",
-      'username': "ExampleUserName",
-    }
-  }
-
-  return render(request, "app/register.html", context=context_dict)
-
-# login view
-def login(request):
-  if request.method == 'POST':
-    email = request.POST.get("email")
-    password = request.POST.get('password1') 
-    user = authenticate(request, username=email, password=password)
-    if user:
-      if user.is_active:
-        auth_login(request, user)
-        return redirect("app:index")
-      else:
-        messages.error(request, "User is not active")
-    else:
-      messages.error(request, "Invalid login details")     
-  return render(request, "app/login.html")
-
-# change password view
-def change_password(request):
-  return render(request, "app/change_password.html")
 
 # search view
 def search(request, query):
@@ -385,12 +316,6 @@ def edit_profile(request):
             return redirect("app:profile")
         else:
           messages.error(request, "SOmething already in use")
- 
-        # else:
-        #     if CustomUser.objects.filter(username=user.email).exists():
-        #         messages.error(request, "Email already exists")
-        #     if CustomUser.objects.filter(username=user.username).exists():
-        #         messages.error(request, "Username already exists")
     else:
         form = UserForm(instance=user)
     return render(request, "app/register.html", {"form": form, "register": False})
