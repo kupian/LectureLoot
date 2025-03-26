@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     'bootstrap5', 
+    'widget_tweaks',
 ]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

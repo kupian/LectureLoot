@@ -56,10 +56,12 @@ def listing_create(request):
       new_listing.seller = request.user
       # save the listing to the database
       
-      dummy_bid = Bid(user=request.user, amount=request.POST["price"])
-      dummy_bid.save()
-      new_listing.highest_bid = dummy_bid
+      new_listing.save()
       
+      dummy_bid = Bid(user=request.user, amount=request.POST["price"], listing=new_listing)
+      dummy_bid.save()
+      
+      new_listing.highest_bid = dummy_bid
       new_listing.save()
 
       # Save media files associated with the listing

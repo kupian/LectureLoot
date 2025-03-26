@@ -6,16 +6,16 @@
 {% block body_block %}
 <body>
     <h1>Categories</h1>
-    <ul>
+    <ul class="list-group list-group-flush">
         <!--Loop through the categories passed in the context-->
         {% for category in categories %}
-        <li>
             <!--Display the category name, and optionally the description-->
-            <a href="{% url 'app:category' category.name %}">{{ category.name }}</a>
+            <a href="{% url 'app:category' category.name %}" class="list-group-item list-group-item-action">
+                {{category.name}}
+            </a>
             {% if category.description %}
                 - {{ category.description }}
             {% endif %}
-        </li>
         {% empty %}
         <!-- If there are no categories, display a default message-->
          <li>No categories found.</li>

@@ -1,34 +1,120 @@
 {% extends 'app/base.html' %}
 {% load static %}
+{% load widget_tweaks %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
 {% block body_block %}
-    <h1>Create Listing</h1>
-    <!--Form to create a new listing-->
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <!--Render all form fields as paragraphs-->
-        {{ form.as_p }}
-
-        <label for="price">Price: £</label>
-        <input name="price" type="number" min="0" step=".01">
-
-        <h2>Upload Media (Images/Videos)</h2>
-        {{ media_formset.management_form }}
-        
-        <!-- Render media form fields -->
-        {% for form in media_formset %}
-            <div class="media-form">
-                <div class="media-0">
-                    {{ form.file.label_tag }} {{ form.file }}
-                    <br>
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="card-title mb-0 fs-4">Create Listing</h1>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                {% for field in form %}
+                                    <div class="mb-3">
+                                        <label for="{{ field.id_for_label }}" class="form-label fw-bold">{{ field.label }}</label>
+                                        {{ field|add_class:"form-control" }}
+                                        {% if field.help_text %}
+                                            <div class="form-text text-muted small">{{ field.help_text }}</div>
+                                        {% endif %}
+                                        {% if field.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {% for error in field.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="price" class="form-label fw-bold">Price</label>
+                            <div class="input-group">
+                                <span class="input-group-text">£</span>
+                                <input class="form-control" name="price" type="number" min="0" step=".01" placeholder="0.00" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid price.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h2 class="fs-5 fw-bold border-bottom pb-2 mb-3">Upload Media (Images/Videos)</h2>
+                            {{ media_formset.management_form }}
+                            
+                            <div class="media-forms-container">
+                                {% for form in media_formset %}
+                                    <div class="media-form card mb-3 p-3 border-light bg-light">
+                                        <div class="media-{{ forloop.counter0 }}">
+                                            <div class="mb-3">
+                                                {{ form.file.label_tag }}
+                                                <div class="input-group">
+                                                    {{ form.file|add_class:"form-control" }}
+                                                    {% if not forloop.first %}
+                                                        <button type="button" class="btn btn-outline-danger remove-media">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    {% endif %}
+                                                </div>
+                                                {% if form.file.errors %}
+                                                    <div class="invalid-feedback d-block">
+                                                        {% for error in form.file.errors %}
+                                                            {{ error }}
+                                                        {% endfor %}
+                                                    </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <button type="button" id="add-media" class="btn btn-outline-secondary mb-3">
+                                <i class="bi bi-plus-circle"></i> Add Another Media File
+                            </button>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'app:index' %}" class="btn btn-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create Listing</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        {% endfor %}
+        </div>
+    </div>
+</div>
 
-        <!--Submit button-->
-        <button type="submit">Submit</button>
-    </form>
+<script src="{% static '/js/add_media.js' %}"></script>
 
-    <script src="{% static '/js/add_media.js' %}"></script>
 
+<script>
+    // Form validation
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            // Fetch all forms we want to apply validation to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
 {% endblock %}
