@@ -143,6 +143,9 @@ def register(request):
 
   return render(request, "app/register.html", context={"register": register})
 
+def about(request):
+  return render(request, 'app/about.html')
+
 
 @login_required
 # edit profile view
