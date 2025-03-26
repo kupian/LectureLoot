@@ -172,4 +172,4 @@ cython_debug/
 
 lectureloot/app/migrations/
 
-lectureloot/media/
+lectureloot/media/listing_media
