@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from datetime import datetime, timedelta
+from django.utils import timezone
+from datetime import timedelta
+
+def one_week_from_now():
+    return timezone.now()+timedelta(weeks=1)
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
@@ -71,8 +76,7 @@ class Listing(models.Model):
     # automatically set the time when the listing is created 
     created_at = models.DateTimeField(auto_now_add = True)
     
-    one_week = datetime.now() + timedelta(weeks=1)
-    end_datetime = models.DateTimeField(default=one_week)
+    end_datetime = models.DateTimeField(default=one_week_from_now)
 
     # automatically update the time whenever the listing is modified 
     updated_at = models.DateTimeField(auto_now = True)
